@@ -14,6 +14,23 @@
                     </div>
                 @endif
 
+                @if ($showBackupCodes && !empty($backupCodes))
+                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-300 rounded">
+                        <p class="text-yellow-800 font-semibold mb-2">
+                            ⚠️ Guarda estos códigos de respaldo en un lugar seguro
+                        </p>
+                        <p class="text-sm text-yellow-700 mb-4">
+                            Estos códigos te permitirán acceder si pierdes tu dispositivo autenticador.
+                            Cada código solo puede usarse una vez.
+                        </p>
+                        <div class="grid grid-cols-2 gap-2">
+                            @foreach($backupCodes as $code)
+                                <code class="bg-gray-100 p-2 rounded text-sm font-mono tracking-widest text-center">{{ $code }}</code>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 @if ($enabled)
                     <div class="mb-6 p-4 bg-green-50 border border-green-300 rounded">
                         <p class="text-green-700 font-semibold">
@@ -21,13 +38,22 @@
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('two-factor.disable') }}">
-                        @csrf
-                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                            onclick="return confirm('¿Deseas desactivar el 2FA?')">
-                            Desactivar 2FA
-                        </button>
-                    </form>
+                    <div class="flex gap-4 mb-6">
+                        <form method="POST" action="{{ route('two-factor.backup-codes.regenerate') }}">
+                            @csrf
+                            <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+                                onclick="return confirm('¿Generar nuevos códigos de respaldo? Los códigos anteriores dejarán de funcionar.')">
+                                Regenerar Códigos de Respaldo
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('two-factor.disable') }}">
+                            @csrf
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                onclick="return confirm('¿Deseas desactivar el 2FA?')">
+                                Desactivar 2FA
+                            </button>
+                        </form>
+                    </div>
                 @else
                     <p class="mb-4 text-gray-700">
                         Escanea este código QR con tu app autenticadora (Google Authenticator, Authy, etc.) y luego ingresa el código de 6 dígitos para activar 2FA.
