@@ -41,7 +41,7 @@
                     <div class="flex gap-4 mb-6">
                         <form method="POST" action="{{ route('two-factor.backup-codes.regenerate') }}">
                             @csrf
-                            <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+                            <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded"
                                 onclick="return confirm('¿Generar nuevos códigos de respaldo? Los códigos anteriores dejarán de funcionar.')">
                                 Regenerar Códigos de Respaldo
                             </button>

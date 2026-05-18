@@ -48,7 +48,7 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <x-primary-button class="bg-yellow-600 hover:bg-yellow-700">
+                <x-primary-button class="bg-yellow-600 hover:bg-yellow-700 text-black">
                     Usar Código de Respaldo
                 </x-primary-button>
             </div>
