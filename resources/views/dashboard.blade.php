@@ -11,6 +11,20 @@
                 <div class="p-6 text-gray-900">
                     {{ __("You're logged in!") }}
                 </div>
+                <div class="p-6 border-t border-gray-200">
+                    @if(auth()->user()->two_factor_enabled)
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 mr-3">
+                            2FA Activado
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 mr-3">
+                            2FA Desactivado
+                        </span>
+                    @endif
+                    <a href="{{ route('two-factor.setup') }}" class="text-blue-600 hover:underline text-sm">
+                        Configurar Autenticación en Dos Factores
+                    </a>
+                </div>
             </div>
         </div>
     </div>
