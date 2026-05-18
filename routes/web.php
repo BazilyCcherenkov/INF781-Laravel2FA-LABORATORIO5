@@ -14,6 +14,8 @@ Route::middleware('auth')->group(function () {
         ->name('two-factor.verify');
     Route::post('/two-factor/verify', [TwoFactorVerifyController::class, 'verify'])
         ->name('two-factor.verify.post');
+    Route::post('/two-factor/verify/backup', [TwoFactorVerifyController::class, 'verifyWithBackupCode'])
+        ->name('two-factor.verify.backup');
 });
 
 Route::middleware(['auth', 'verified', 'two-factor'])->group(function () {
@@ -31,6 +33,8 @@ Route::middleware(['auth', 'verified', 'two-factor'])->group(function () {
         ->name('two-factor.enable');
     Route::post('/two-factor/disable', [TwoFactorController::class, 'disable'])
         ->name('two-factor.disable');
+    Route::post('/two-factor/backup-codes/regenerate', [TwoFactorController::class, 'regenerateBackupCodes'])
+        ->name('two-factor.backup-codes.regenerate');
 });
 
 require __DIR__.'/auth.php';

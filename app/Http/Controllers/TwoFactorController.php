@@ -11,6 +11,20 @@ use BaconQrCode\Writer;
 
 class TwoFactorController extends Controller
 {
+    private function generateBackupCodes(): array
+    {
+        $codes = [];
+        for ($i = 0; $i < 8; $i++) {
+            $codes[] = strtoupper(bin2hex(random_bytes(4)));
+        }
+        return $codes;
+    }
+
+    private function hashBackupCodes(array $codes): array
+    {
+        return array_map(fn($code) => password_hash($code, PASSWORD_BCRYPT), $codes);
+    }
+
     public function show(Request $request)
     {
         $user = $request->user();
@@ -38,6 +52,8 @@ class TwoFactorController extends Controller
             'qrCodeSvg' => $qrCodeSvg,
             'secret' => $user->two_factor_secret,
             'enabled' => $user->two_factor_enabled,
+            'showBackupCodes' => $request->session()->get('show_backup_codes', false),
+            'backupCodes' => $request->session()->get('backup_codes', []),
         ]);
     }
 
@@ -54,10 +70,34 @@ class TwoFactorController extends Controller
             return back()->withErrors(['code' => 'El código OTP es inválido.']);
         }
 
-        $user->update(['two_factor_enabled' => true]);
+        $plainCodes = $this->generateBackupCodes();
+        $hashedCodes = $this->hashBackupCodes($plainCodes);
+
+        $user->update([
+            'two_factor_enabled' => true,
+            'backup_codes' => json_encode($hashedCodes),
+        ]);
+
+        $request->session()->put('show_backup_codes', true);
+        $request->session()->put('backup_codes', $plainCodes);
 
         return redirect()->route('two-factor.setup')
             ->with('status', '2FA activado correctamente.');
+    }
+
+    public function regenerateBackupCodes(Request $request)
+    {
+        $user = $request->user();
+        $plainCodes = $this->generateBackupCodes();
+        $hashedCodes = $this->hashBackupCodes($plainCodes);
+
+        $user->update(['backup_codes' => json_encode($hashedCodes)]);
+
+        $request->session()->put('show_backup_codes', true);
+        $request->session()->put('backup_codes', $plainCodes);
+
+        return redirect()->route('two-factor.setup')
+            ->with('status', 'Códigos de respaldo regenerados.');
     }
 
     public function disable(Request $request)
@@ -65,9 +105,17 @@ class TwoFactorController extends Controller
         $request->user()->update([
             'two_factor_enabled' => false,
             'two_factor_secret' => null,
+            'backup_codes' => null,
         ]);
+
+        $request->session()->forget(['show_backup_codes', 'backup_codes']);
 
         return redirect()->route('two-factor.setup')
             ->with('status', '2FA desactivado.');
+    }
+
+    public function verifyBackupCode(Request $request)
+    {
+        return app(TwoFactorVerifyController::class)->verifyWithBackupCode($request);
     }
 }
