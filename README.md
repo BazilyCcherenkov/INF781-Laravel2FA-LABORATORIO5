@@ -1,58 +1,144 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# INF781-Laravel2FA - Autenticación de Dos Factores con TOTP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Descripción
 
-## About Laravel
+Proyecto de laboratorio para la materia INF_781 que implementa autenticación de dos factores (2FA) basada en TOTP (Time-based One-Time Password) usando Laravel 13, PostgreSQL y la librería google2fa-laravel.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+La aplicación combina factor de conocimiento (contraseña) con factor de posesión (código TOTP de 6 dígitos que cambia cada 30 segundos) y códigos de respaldo para recuperación.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Características
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 🔐 Autenticación de dos factores con TOTP
+- 📱 Códigos QR para configuración en Google Authenticator
+- 🔑 8 códigos de respaldo hasheados con bcrypt
+- 🗄️ Base de datos PostgreSQL
+- 🎨 Interfaz con Laravel Breeze (Blade + Tailwind)
+- 🛡️ Middleware de protección de rutas
 
-## Learning Laravel
+## Requisitos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.3+
+- Composer 2.x
+- Node.js 20.x LTS
+- PostgreSQL 15+
+- Extensiones PHP: pdo_pgsql, mbstring, xml, gd
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Instalación
 
 ```bash
-composer require laravel/boost --dev
+# Clonar el repositorio
+git clone https://github.com/BazilyCcherenkov/INF781-Laravel2FA-LABORATORIO5.git
+cd INF781-Laravel2FA
 
-php artisan boost:install
+# Instalar dependencias PHP
+composer install
+
+# Instalar dependencias Node.js
+npm install
+
+# Compilar assets
+npm run build
+
+# Configurar variables de entorno
+cp .env.example .env
+# Editar .env con configuración de PostgreSQL
+
+# Generar clave de aplicación
+php artisan key:generate
+
+# Ejecutar migraciones
+php artisan migrate
+
+# Iniciar servidor
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Configuración de Base de Datos PostgreSQL
 
-## Contributing
+```sql
+-- Crear usuario y base de datos
+CREATE USER laravel_2fa_user WITH PASSWORD 'secret2fa';
+CREATE DATABASE laravel_2fa OWNER laravel_2fa_user;
+GRANT ALL PRIVILEGES ON DATABASE laravel_2fa TO laravel_2fa_user;
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Variables de Entorno (.env)
 
-## Code of Conduct
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=laravel_2fa
+DB_USERNAME=laravel_2fa_user
+DB_PASSWORD=secret2fa
+SESSION_DRIVER=database
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Uso
 
-## Security Vulnerabilities
+1. Registra un nuevo usuario en `/register`
+2. Ve al Dashboard y haz clic en "Configurar Autenticación en Dos Factores"
+3. Escanea el código QR con Google Authenticator (o similar)
+4. Ingresa el código de 6 dígitos para activar 2FA
+5. **Importante**: Guarda los códigos de respaldo que se muestran
+6. La próxima vez que inicies sesión, ingresa el código TOTP o un código de respaldo
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Estructura del Proyecto
 
-## License
+```
+INF781-Laravel2FA/
+├── app/Http/Controllers/
+│   ├── TwoFactorController.php       # Configuración 2FA
+│   └── TwoFactorVerifyController.php # Verificación OTP
+├── app/Http/Middleware/
+│   └── TwoFactorMiddleware.php       # Protección de rutas
+├── app/Models/
+│   └── User.php                      # Modelo con campos 2FA
+├── database/migrations/
+│   ├── 2026_05_18_200619_add_two_factor_to_users_table.php
+│   └── 2026_05_18_210653_add_backup_codes_to_users_table.php
+├── resources/views/
+│   └── two-factor/
+│       ├── setup.blade.php           # Configuración 2FA
+│       └── verify.blade.php          # Verificación OTP
+└── config/
+    └── google2fa.php                 # Configuración TOTP
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Comandos Útiles
+
+```bash
+# Ver rutas
+php artisan route:list
+
+# Limpiar caches
+php artisan view:clear
+php artisan config:clear
+
+# Verificar versión Laravel
+php artisan --version
+```
+
+## Tags de Git
+
+- `guia5/inicio` - Proyecto inicial
+- `guia5/postgresql` - Configuración PostgreSQL
+- `guia5/breeze` - Laravel Breeze instalado
+- `guia5/librerias-2fa` - Librerías 2FA
+- `guia5/migracion-2fa` - Migración de columnas 2FA
+- `guia5/controladores-2fa` - Controladores implementados
+- `guia5/middleware-2fa` - Middleware de protección
+- `guia5/rutas-vistas-2fa` - Rutas y vistas
+- `mejora/backup-codes` - Códigos de respaldo
+- `v1.0` - Versión final del laboratorio
+
+## Licencia
+
+MIT License
+
+## Datos de Contacto
+
+- **Estudiante**: Bazily Ccherenkov
+- **Institución**: Universidad/Instituto
+- **Materia**: INF_781 - Framework PHP (Laravel)
+- **GitHub**: https://github.com/BazilyCcherenkov/INF781-Laravel2FA-LABORATORIO5
