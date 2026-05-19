@@ -8,12 +8,12 @@ La aplicación combina factor de conocimiento (contraseña) con factor de posesi
 
 ## Características
 
-- 🔐 Autenticación de dos factores con TOTP
-- 📱 Códigos QR para configuración en Google Authenticator
-- 🔑 8 códigos de respaldo hasheados con bcrypt
-- 🗄️ Base de datos PostgreSQL
-- 🎨 Interfaz con Laravel Breeze (Blade + Tailwind)
-- 🛡️ Middleware de protección de rutas
+- Autenticación de dos factores con TOTP
+- Códigos QR para configuración en Google Authenticator
+- 8 códigos de respaldo hasheados con bcrypt
+- Base de datos PostgreSQL
+- Interfaz con Laravel Breeze (Blade + Tailwind)
+- Middleware de protección de rutas
 
 ## Requisitos
 
@@ -119,26 +119,6 @@ php artisan config:clear
 php artisan --version
 ```
 
-## Tags de Git
-
-- `guia5/inicio` - Proyecto inicial
-- `guia5/postgresql` - Configuración PostgreSQL
-- `guia5/breeze` - Laravel Breeze instalado
-- `guia5/librerias-2fa` - Librerías 2FA
-- `guia5/migracion-2fa` - Migración de columnas 2FA
-- `guia5/controladores-2fa` - Controladores implementados
-- `guia5/middleware-2fa` - Middleware de protección
-- `guia5/rutas-vistas-2fa` - Rutas y vistas
-- `mejora/backup-codes` - Códigos de respaldo
-- `v1.0` - Versión final del laboratorio
-
 ## Licencia
 
 MIT License
-
-## Datos de Contacto
-
-- **Estudiante**: Bazily Ccherenkov
-- **Institución**: Universidad/Instituto
-- **Materia**: INF_781 - Framework PHP (Laravel)
-- **GitHub**: https://github.com/BazilyCcherenkov/INF781-Laravel2FA-LABORATORIO5
